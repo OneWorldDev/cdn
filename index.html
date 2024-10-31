@@ -3,25 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple CDN Simulation</title>
+    <title>Okhotsk Telecom</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f4f4f4;
+            background-color: #e0e0e0; /* Light gray background */
         }
+
         .container {
             max-width: 600px;
             margin: auto;
-            background: white;
+            background: #fff; /* White background for the container */
             padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Soft shadow */
         }
-        h1, h2 {
-            color: #333;
+
+        h1 {
+            color: #2c3e50; /* Darker shade for headings */
         }
+
+        h2 {
+            color: #34495e; /* Slightly lighter shade for subheadings */
+        }
+
+        input[type="file"], input[type="text"], button {
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc; /* Light border */
+            border-radius: 5px; /* Rounded input fields */
+        }
+
+        button {
+            background-color: #3498db; /* Button color */
+            color: white; /* Button text color */
+            border: none; /* Remove border */
+            cursor: pointer; /* Pointer cursor on hover */
+        }
+
+        button:hover {
+            background-color: #2980b9; /* Darker shade on hover */
+        }
+
         #linkContainer {
             margin-top: 20px;
         }
@@ -29,7 +55,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>Simple CDN Simulation</h1>
+        <h1>Welcome to Okhotsk Telecom</h1>
+        <p>Manage your files seamlessly without storing them on your device.</p>
         <input type="file" id="fileInput">
         <button id="uploadButton">Upload</button>
         <div id="linkContainer"></div>
