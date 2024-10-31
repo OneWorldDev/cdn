@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OKhotsk Telecom - File Upload</title>
-    <link rel="stylesheet" href="https://okhotsk.k4rt1.xyz/css.bootstrap.site.okhotsk.min.css">
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
         body {
@@ -30,17 +29,8 @@
     </style>
 </head>
 <body>
-    <header class="waybar">
+    <header>
         <div class="logo">OKhotsk Telecom</div>
-        <nav class="nav-links">
-            <a href="https://okhotsk.k4rt1.xyz/">Home</a>
-            <a href="https://okhotsk.k4rt1.xyz/terms">Terms Of Services</a>
-            <a href="https://okhotsk.k4rt1.xyz/privacy">Privacy Policy</a>
-            <a href="https://okhotsk.k4rt1.xyz/coc/codeofconduct">Code of Conduct</a>
-            <a href="https://okhotsk.k4rt1.xyz/partners">Partners</a>
-            <a href="https://okhotsk.k4rt1.xyz/contact">Contact</a>
-            <a href="https://okhotsk.k4rt1.xyz/upload" class="active">File Upload</a>
-        </nav>
     </header>
     
     <main>
@@ -65,10 +55,6 @@
         <div class="footer-container">
             <div class="footer-left">
                 <h1>OKhotsk</h1>
-                <h3>Support</h3>
-                <p><a href="mailto:okhotsk@k4rt1.xyz">okhotsk@k4rt1.xyz</a></p>
-                <p><a href="mailto:support@k4rt1.xyz">support@k4rt1.xyz</a></p>
-                <p><a href="mailto:leevi@k4rt1.xyz">leevi@k4rt1.xyz</a></p>
             </div>
         </div>
     </footer>
@@ -80,46 +66,48 @@
         const deleteButton = document.getElementById('deleteButton');
         const fileNameInput = document.getElementById('fileNameInput');
 
-        // Load existing files from local storage
-        window.onload = () => {
-            const files = JSON.parse(localStorage.getItem('files')) || [];
-            files.forEach(file => displayFileLink(file));
-        };
-
-        uploadButton.addEventListener('click', () => {
+        uploadButton.addEventListener('click', async () => {
             const file = fileInput.files[0];
             if (!file) {
                 alert('Please select a file to upload.');
                 return;
             }
 
-            const uniquePath = generateUniquePath(file.name);
-            const fileInfo = {
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                path: uniquePath
-            };
+            const githubToken = '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'; // Your GitHub token
+            const githubRepo = 'oneworlddev/cdn'; // Your GitHub repository
+            const filePath = `media/${file.name}`;
 
-            // Save file info to local storage
-            const files = JSON.parse(localStorage.getItem('files')) || [];
-            files.push(fileInfo);
-            localStorage.setItem('files', JSON.stringify(files));
+            try {
+                const response = await fetch(`https://api.github.com/repos/${githubRepo}/contents/${filePath}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${githubToken}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify({
+                        message: `Upload ${file.name}`,
+                        content: btoa(await file.arrayBuffer())
+                    })
+                });
 
-            displayFileLink(fileInfo);
+                if (response.ok) {
+                    const data = await response.json();
+                    displayFileLink(data.content.download_url);
+                } else {
+                    alert('Error uploading file: ' + response.statusText);
+                }
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            }
+
             fileInput.value = ''; // Clear input
         });
 
-        function generateUniquePath(fileName) {
-            const randomDir = `gfvf-fjsfn`; // Replace with logic to generate random directory name
-            const uniqueName = `${Date.now()}_${fileName}`; // Unique file name
-            return `/media/${randomDir}/${uniqueName}`;
-        }
-
-        function displayFileLink(file) {
+        function displayFileLink(url) {
             const linkElement = document.createElement('a');
-            linkElement.href = `#`; // Change to actual path if needed
-            linkElement.textContent = `File uploaded: ${file.path} (${file.size} bytes)`;
+            linkElement.href = url;
+            linkElement.target = '_blank';
+            linkElement.textContent = `File uploaded: ${url}`;
             linkContainer.appendChild(linkElement);
             linkContainer.appendChild(document.createElement('br'));
         }
@@ -131,13 +119,8 @@
                 return;
             }
 
-            let files = JSON.parse(localStorage.getItem('files')) || [];
-            files = files.filter(file => !file.path.includes(fileName)); // Match by path
-            localStorage.setItem('files', JSON.stringify(files));
-
-            linkContainer.innerHTML = ''; // Clear the link container
-            files.forEach(file => displayFileLink(file)); // Redisplay links
-            alert('File deleted successfully.');
+            // Implement deletion logic here if needed.
+            alert('Delete functionality not implemented.');
         });
     </script>
 </body>
