@@ -26,6 +26,13 @@
         #linkContainer {
             margin-top: 20px;
         }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -73,7 +80,7 @@
                 return;
             }
 
-            const githubToken = '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'; // Your GitHub token
+            const githubToken = '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'; // Example token (replace this)
             const githubRepo = 'oneworlddev/cdn'; // Your GitHub repository
             const filePath = `media/${file.name}`;
 
@@ -108,8 +115,8 @@
             linkElement.href = url;
             linkElement.target = '_blank';
             linkElement.textContent = `File uploaded: ${url}`;
+            linkElement.style.display = 'block'; // Ensure the link is on its own line
             linkContainer.appendChild(linkElement);
-            linkContainer.appendChild(document.createElement('br'));
         }
 
         deleteButton.addEventListener('click', () => {
