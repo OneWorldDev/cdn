@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple CDN Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        #linkContainer {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple CDN Simulation</h1>
+        <input type="file" id="fileInput">
+        <button id="uploadButton">Upload</button>
+        <div id="linkContainer"></div>
+        <h2>Delete File</h2>
+        <input type="text" id="fileNameInput" placeholder="File name to delete">
+        <button id="deleteButton">Delete</button>
+    </div>
+    <script>
+        const uploadButton = document.getElementById('uploadButton');
+        const fileInput = document.getElementById('fileInput');
+        const linkContainer = document.getElementById('linkContainer');
+        const deleteButton = document.getElementById('deleteButton');
+        const fileNameInput = document.getElementById('fileNameInput');
+
+        uploadButton.addEventListener('click', () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file to upload.');
+                return;
+            }
+
+            const link = URL.createObjectURL(file);
+            const linkElement = document.createElement('a');
+            linkElement.href = link;
+            linkElement.target = '_blank';
+            linkElement.textContent = `File uploaded: ${file.name}`;
+            linkContainer.appendChild(linkElement);
+            linkContainer.appendChild(document.createElement('br'));
+        });
+
+        deleteButton.addEventListener('click', () => {
+            const fileName = fileNameInput.value;
+            if (!fileName) {
+                alert('Please enter a file name to delete.');
+                return;
+            }
+
+            const links = linkContainer.getElementsByTagName('a');
+            for (let i = 0; i < links.length; i++) {
+                if (links[i].textContent.includes(fileName)) {
+                    linkContainer.removeChild(links[i]);
+                    alert('File deleted successfully.');
+                    return;
+                }
+            }
+            alert('File not found.');
+        });
+    </script>
+</body>
+</html>
