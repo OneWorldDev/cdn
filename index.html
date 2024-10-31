@@ -93,11 +93,12 @@
                 return;
             }
 
+            const uniquePath = generateUniquePath(file.name);
             const fileInfo = {
                 name: file.name,
                 size: file.size,
                 type: file.type,
-                url: URL.createObjectURL(file)
+                path: uniquePath
             };
 
             // Save file info to local storage
@@ -109,11 +110,16 @@
             fileInput.value = ''; // Clear input
         });
 
+        function generateUniquePath(fileName) {
+            const randomDir = `gfvf-fjsfn`; // Replace with logic to generate random directory name
+            const uniqueName = `${Date.now()}_${fileName}`; // Unique file name
+            return `/media/${randomDir}/${uniqueName}`;
+        }
+
         function displayFileLink(file) {
             const linkElement = document.createElement('a');
-            linkElement.href = file.url;
-            linkElement.target = '_blank';
-            linkElement.textContent = `File uploaded: ${file.name} (${file.size} bytes)`;
+            linkElement.href = `#`; // Change to actual path if needed
+            linkElement.textContent = `File uploaded: ${file.path} (${file.size} bytes)`;
             linkContainer.appendChild(linkElement);
             linkContainer.appendChild(document.createElement('br'));
         }
@@ -126,7 +132,7 @@
             }
 
             let files = JSON.parse(localStorage.getItem('files')) || [];
-            files = files.filter(file => file.name !== fileName);
+            files = files.filter(file => !file.path.includes(fileName)); // Match by path
             localStorage.setItem('files', JSON.stringify(files));
 
             linkContainer.innerHTML = ''; // Clear the link container
