@@ -2,69 +2,67 @@ const formidable = require('formidable');
 const fs = require('fs');
 const path = require('path');
 
-exports.handler = async function(event, context) {
+exports.handler = async (event, context) => {
+  // Create a new incoming form
   const form = new formidable.IncomingForm();
-  form.uploadDir = path.join(__dirname, 'uploads');
-  form.keepExtensions = true;
-
-  // Create the uploads directory if it doesn't exist
-  if (!fs.existsSync(form.uploadDir)) {
-    fs.mkdirSync(form.uploadDir);
+  
+  // Specify upload directory inside the function folder
+  const uploadDir = path.join(__dirname, 'uploads');
+  
+  // Create upload directory if it doesn't exist
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
   }
 
-  // Log the incoming event for debugging purposes
-  console.log("Incoming event:", event);
+  form.uploadDir = uploadDir; // Set the upload directory for files
+  form.keepExtensions = true; // Keep the original file extensions
 
   return new Promise((resolve, reject) => {
-    // Parse the form data
     form.parse(event, (err, fields, files) => {
       if (err) {
         console.error("Error parsing form:", err);
         return resolve({
           statusCode: 500,
-          body: JSON.stringify({ message: 'Error parsing the form' })
+          body: JSON.stringify({ message: 'Error parsing form' }),
         });
       }
 
-      // Log the files and fields for debugging
-      console.log("Fields:", fields);
-      console.log("Files:", files);
+      // Log fields and files for debugging
+      console.log('Fields:', fields);
+      console.log('Files:', files);
 
-      // Ensure the file is uploaded
       if (!files.file || !files.file[0]) {
         return resolve({
           statusCode: 400,
-          body: JSON.stringify({ message: 'No file uploaded' })
+          body: JSON.stringify({ message: 'No file uploaded' }),
         });
       }
 
       const uploadedFile = files.file[0];
       const fileName = uploadedFile.originalFilename;
-      const fileType = uploadedFile.mimetype;
+      const filePath = path.join(uploadDir, fileName);
 
-      // Check if the file is either a .txt or .jpeg file
-      if (fileType !== 'text/plain' && fileType !== 'image/jpeg') {
+      // Check for file type (Only accept .txt and .jpeg)
+      if (uploadedFile.mimetype !== 'text/plain' && uploadedFile.mimetype !== 'image/jpeg') {
         return resolve({
           statusCode: 400,
-          body: JSON.stringify({ message: 'Invalid file type. Only .txt and .jpeg are allowed.' })
+          body: JSON.stringify({ message: 'Invalid file type. Only .txt and .jpeg files are allowed.' }),
         });
       }
 
-      // Move the file to the uploads directory
-      const filePath = path.join(form.uploadDir, fileName);
+      // Rename and move the uploaded file
       fs.rename(uploadedFile.filepath, filePath, (err) => {
         if (err) {
-          console.error("Error moving the file:", err);
+          console.error('Error moving file:', err);
           return resolve({
             statusCode: 500,
-            body: JSON.stringify({ message: 'Error saving file' })
+            body: JSON.stringify({ message: 'Error saving file' }),
           });
         }
 
-        console.log(`File uploaded successfully: ${filePath}`);
         return resolve({
           statusCode: 200,
-          body: JSON.stringify({ message: 'File uploaded successfully', filePath: filePath })
+          body: JSON.stringify({ message: 'File uploaded successfully', filePath }),
         });
       });
     });
