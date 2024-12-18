@@ -3,132 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OKhotsk Telecom - File Upload</title>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <title>File Upload</title>
     <style>
         body {
-            font-family: 'VT323', monospace;
-            margin: 0;
+            font-family: Arial, sans-serif;
             padding: 20px;
-            background-color: #f4f4f4;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
         .container {
-            max-width: 600px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
         }
-        h1, h2 {
-            color: #333;
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
         }
-        #linkContainer {
-            margin-top: 20px;
+        input[type="file"] {
+            width: 100%;
+            margin: 10px 0;
         }
-        a {
-            color: #007bff;
-            text-decoration: none;
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
-        a:hover {
-            text-decoration: underline;
+        button:hover {
+            background-color: #45a049;
+        }
+        .status {
+            text-align: center;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">OKhotsk Telecom</div>
-    </header>
-    
-    <main>
-        <section class="hero">
-            <h1>File Upload</h1>
-            <p>Upload your files to our secure storage.</p>
-        </section>
-
-        <section class="upload-section">
-            <div class="container">
-                <input type="file" id="fileInput">
-                <button id="uploadButton">Upload</button>
-                <div id="linkContainer"></div>
-                <h2>Delete File</h2>
-                <input type="text" id="fileNameInput" placeholder="File name to delete">
-                <button id="deleteButton">Delete</button>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="footer-container">
-            <div class="footer-left">
-                <h1>OKhotsk</h1>
-            </div>
-        </div>
-    </footer>
+    <div class="container">
+        <h2>Upload Your File</h2>
+        <input type="file" id="fileInput" />
+        <button onclick="uploadFile()">Upload File</button>
+        <div class="status" id="status"></div>
+    </div>
 
     <script>
-        const uploadButton = document.getElementById('uploadButton');
-        const fileInput = document.getElementById('fileInput');
-        const linkContainer = document.getElementById('linkContainer');
-        const deleteButton = document.getElementById('deleteButton');
-        const fileNameInput = document.getElementById('fileNameInput');
-
-        uploadButton.addEventListener('click', async () => {
+        // Function to handle file upload
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const statusDiv = document.getElementById('status');
             const file = fileInput.files[0];
+
             if (!file) {
-                alert('Please select a file to upload.');
+                statusDiv.textContent = "Please choose a file to upload.";
                 return;
             }
 
-            const githubToken = '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'; // Example token (replace this)
-            const githubRepo = 'oneworlddev/cdn'; // Your GitHub repository
-            const filePath = `media/${file.name}`;
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("fileName", file.name); // Send the file name
 
             try {
-                const response = await fetch(`https://api.github.com/repos/${githubRepo}/contents/${filePath}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${githubToken}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    },
-                    body: JSON.stringify({
-                        message: `Upload ${file.name}`,
-                        content: btoa(await file.arrayBuffer())
-                    })
+                // Send the file to the serverless function
+                const response = await fetch("/.netlify/functions/upload", {
+                    method: "POST",
+                    body: formData
                 });
 
+                const result = await response.json();
+
                 if (response.ok) {
-                    const data = await response.json();
-                    displayFileLink(data.content.download_url);
+                    statusDiv.textContent = "File uploaded successfully!";
                 } else {
-                    alert('Error uploading file: ' + response.statusText);
+                    statusDiv.textContent = `Error: ${result.message}`;
                 }
             } catch (error) {
-                console.error('Error uploading file:', error);
+                statusDiv.textContent = `Error: ${error.message}`;
             }
-
-            fileInput.value = ''; // Clear input
-        });
-
-        function displayFileLink(url) {
-            const linkElement = document.createElement('a');
-            linkElement.href = url;
-            linkElement.target = '_blank';
-            linkElement.textContent = `File uploaded: ${url}`;
-            linkElement.style.display = 'block'; // Ensure the link is on its own line
-            linkContainer.appendChild(linkElement);
         }
-
-        deleteButton.addEventListener('click', () => {
-            const fileName = fileNameInput.value;
-            if (!fileName) {
-                alert('Please enter a file name to delete.');
-                return;
-            }
-
-            // Implement deletion logic here if needed.
-            alert('Delete functionality not implemented.');
-        });
     </script>
 </body>
 </html>
